@@ -13,7 +13,8 @@ namespace Westhouse.DialBox
         public CellType cellType;
         DiagGridManipulator grid;
         public Vector2Int gridIndex;
-        bool placed;
+        public string name;
+        bool hasIndex;
         public DiagCellManipulator(VisualElement target, DiagGridManipulator grid)
         {
             this.target = target;
@@ -125,12 +126,12 @@ namespace Westhouse.DialBox
 
                 if(grid.IndexOccupied(newIndex))
                 {
-                    if(!placed)
+                    if(!hasIndex)
                         DeleteCell();
                         
                 }else
                 {
-                    placed = true;
+                    hasIndex = true;
                     gridIndex = newIndex;
                 }
 
@@ -149,12 +150,32 @@ namespace Westhouse.DialBox
         {
 
             Vector2 newPos = grid.GridToLocal(gridIndex);
+            target.style.position = Position.Absolute;
             
             target.style.left = newPos.x - grid.cellWidth * 0.5f * grid.scale;
             target.style.top = newPos.y - grid.cellHeight * 0.5f * grid.scale;
 
             target.style.width = grid.cellWidth * grid.scale;
             target.style.height = grid.cellHeight * grid.scale;
+        }
+
+        public virtual DialNode WriteNode()
+        {
+            DialNode node = new DialNode();
+
+            node.gridIndex = gridIndex;
+            node.name = name;
+
+
+            return node;
+        }
+
+        public virtual void ReadNode(DialNode node)
+        {
+            //enures not accidentally deleted
+            hasIndex = true;
+            gridIndex = node.gridIndex;
+
         }
         
     }

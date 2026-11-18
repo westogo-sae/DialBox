@@ -9,8 +9,8 @@ namespace Westhouse.DialBox
 
     public class DialBoxEditor : EditorWindow
     {
-        [SerializeField]
-        private VisualTreeAsset m_VisualTreeAsset = default;
+        [SerializeField] private VisualTreeAsset VisualTreeAsset = default;
+        [SerializeField] private VisualTreeAsset cellTreeAsset = default;
 
         [MenuItem("Tools/DialBox")]
         public static void ShowExample()
@@ -19,18 +19,23 @@ namespace Westhouse.DialBox
         }
 
         private DiagGridManipulator gridManipulator;
+        private DialBox activeDialBox;
         //private fileDialogue
         public void CreateGUI()
         {
+            Debug.Log(activeDialBox);
             // Each editor window contains a root VisualElement object
             VisualElement root = rootVisualElement;
 
             // Instantiate UXML
-            VisualElement labelFromUXML = m_VisualTreeAsset.Instantiate();
+            VisualElement labelFromUXML = VisualTreeAsset.Instantiate();
             root.Add(labelFromUXML);
+
 
             AssignManipulators(root);
             gridManipulator.Repaint();
+
+            (root.Q(name:"save") as Button).clicked += Save;
 
 
         }
@@ -60,11 +65,41 @@ namespace Westhouse.DialBox
 
         public void Save()
         {
-            Debug.Log("TODO -> save");
+            List<DialNode> newNodes = new();
+            foreach(var cell in gridManipulator.cells)
+            {
+                newNodes.Add(cell.WriteNode());
+            }
+            activeDialBox.nodes = newNodes.ToArray();
+        }
+
+        public void Compile()
+        {
+            activeDialBox.Recompile();
         }
         public void Load(DialBox dialBox)
         {
-            Debug.Log("TODO -> load");
+            activeDialBox = dialBox;
+
+            foreach(var cell in gridManipulator.cells)
+            {
+                gridManipulator.target.Remove(cell.target); // remove all old cell;
+            }
+            gridManipulator.cells = new();
+
+            if(dialBox.nodes != null)
+                foreach(var node in dialBox.nodes)
+                {
+                    VisualElement cellElement = cellTreeAsset.Instantiate();
+                    DiagCellManipulator cellManipulator = new DiagCellManipulator(cellElement, gridManipulator);
+                    cellManipulator.ReadNode(node);
+                    
+                    gridManipulator.cells.Add(cellManipulator);
+                    gridManipulator.target.Add(cellElement);
+                    
+                }
+
+            gridManipulator.Repaint();
         }
     }
 

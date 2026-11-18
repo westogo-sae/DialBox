@@ -182,6 +182,7 @@ namespace Westhouse.DialBox
             foreach(var cell in cells)
             {
                 cell.Repaint();
+                Debug.Log(cell.gridIndex);
             }
         }
     }

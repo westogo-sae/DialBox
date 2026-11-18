@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Westhouse.DialBox
@@ -6,6 +7,26 @@ namespace Westhouse.DialBox
     public class DialBox : ScriptableObject
     {
         
+        public DialNode[] nodes;
+
+
+        public void Recompile()
+        {
+            throw new NotImplementedException();
+        }
     }
+    
+
+    [Serializable]
+    public class DialNode
+    {
+        public Vector2Int gridIndex;
+        public string name;
+    }
+
+    // public class CompiledDialNode
+    // {
+        
+    // }
 
 }
